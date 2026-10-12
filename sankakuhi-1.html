@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三角関数 有名角クイズ</title>
+<style html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 18px 12px;
+  }
+
+  header h1 {
+    font-size: 21px;
+  }
+
+  main {
+    margin: 16px auto;
+    padding: 0 10px 28px;
+  }
+
+  .panel {
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+  }
+
+  .ranges {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .range {
+    min-height: 64px;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .range strong {
+    font-size: 14px;
+  }
+
+  .question {
+    padding: 24px 8px;
+  }
+
+  #expression {
+    font-size: clamp(28px, 8vw, 40px);
+    overflow-wrap: anywhere;
+  }
+
+  .choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .choice {
+    min-height: 64px;
+    padding: 12px 6px;
+    font-size: 20px;
+  }
+
+  .actions button {
+    min-height: 48px;
+  }
+
+  .stat strong {
+    font-size: 21px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ranges {
+    grid-template-columns: 1fr;
+  }
+
+  .info {
+    font-size: 12px;
+  }
+
+  .choice {
+    font-size: 18px;
+  }
+}>
+:root {
+  --main: #4263eb;
+  --bg: #f4f7fc;
+  --text: #202943;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  background: #fff;
+  padding: 22px 16px;
+  text-align: center;
+  border-bottom: 1px solid #e5eaf3;
+}
+header h1 { margin: 0; font-size: 24px; }
+header p { margin: 8px 0 0; color: #68738a; }
+main {
+  max-width: 760px;
+  margin: 28px auto;
+  padding: 0 16px 40px;
+}
+.panel {
+  background: white;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 5px 22px #2538580c;
+  margin-bottom: 18px;
+}
+h2 { font-size: 18px; margin: 0 0 16px; }
+.ranges {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.range {
+  border: 1.5px solid #dce3f0;
+  border-radius: 12px;
+  padding: 13px 10px;
+  text-align: left;
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.range strong { display: block; font-size: 16px; }
+.range.active {
+  border-color: var(--main);
+  background: #edf1ff;
+  color: #2e4ed0;
+}
+.range:hover, .choice:hover { border-color: var(--main); }
+.info {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #68738a;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+.question {
+  background: #f1f4ff;
+  border-radius: 16px;
+  padding: 30px 12px;
+  text-align: center;
+}
+.question small { color: #68738a; }
+#expression {
+  font-size: clamp(32px, 8vw, 46px);
+  font-weight: 750;
+  margin-top: 12px;
+}
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.choice {
+  min-height: 62px;
+  padding: 12px;
+  background: white;
+  border: 1.5px solid #dce3f0;
+  border-radius: 12px;
+  font-size: 22px;
+  color: var(--text);
+  cursor: pointer;
+}
+.choice:disabled { cursor: default; }
+.choice.correct {
+  background: #e2f8eb;
+  border-color: #24a568;
+  color: #137343;
+}
+.choice.wrong {
+  background: #fff0ed;
+  border-color: #e66a59;
+  color: #b83c30;
+}
+#feedback {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f5f7fb;
+  line-height: 1.8;
+  display: none;
+}
+#feedback.show { display: block; }
+#feedback.good { background: #e2f8eb; }
+#feedback.bad { background: #fff0ed; }
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+button.primary, button.secondary {
+  border: none;
+  border-radius: 11px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.primary {
+  background: var(--main);
+  color: white;
+  flex: 1;
+}
+.primary:disabled { opacity: .45; cursor: default; }
+.secondary {
+  background: #edf0f7;
+  color: #35415d;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.stat {
+  background: #f7f8fc;
+  padding: 14px 6px;
+  text-align: center;
+  border-radius: 12px;
+}
+.stat span { display: block; font-size: 12px; color: #68738a; }
+.stat strong { display: block; font-size: 23px; margin-top: 5px; }
+.note { color: #68738a; font-size: 13px; line-height: 1.8; }
+@media(max-width: 440px) {
+  .panel { padding: 18px; }
+  .ranges { grid-template-columns: 1fr; }
+  .range { padding: 10px 12px; }
+  .choices { gap: 9px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>三角関数 有名角クイズ</h1>
+  <p>角度の範囲を選んで、三角関数をマスターしよう！</p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>① 練習する角度の範囲</h2>
+    <div class="ranges" id="ranges"></div>
+  </section>
+
+  <section class="panel">
+    <div class="info">
+      <span id="rangeLabel">0°〜90°</span>
+      <span id="questionNo">第 1 問</span>
+    </div>
+
+    <div class="question">
+      <small>次の値を求めよう</small>
+      <div id="expression">sin 30° = ?</div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+    <div id="feedback" role="status" aria-live="polite"></div>
+
+    <div class="actions">
+      <button class="secondary" id="skip">わからない</button>
+      <button class="primary" id="next" disabled>次の問題 →</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>学習記録</h2>
+    <div class="stats">
+      <div class="stat">
+        <span>回答数</span>
+        <strong id="total">0</strong>
+      </div>
+      <div class="stat">
+        <span>正解数</span>
+        <strong id="correct">0</strong>
+      </div>
+      <div class="stat">
+        <span>正答率</span>
+        <strong id="rate">0%</strong>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="reset">記録をリセット</button>
+    </div>
+  </section>
+
+  <p class="note">
+    出題対象：0°、30°、45°、60°、90°、120°、135°、
+    150°、180°、210°、225°、240°、270°、300°、315°、330°。
+    tan 90°、tan 270°は「定義されない」が正解です。
+  </p>
+</main>
+
+<script>
+const ranges = [
+  { label: "① 第1象限", text: "0°〜90°", min: 0, max: 90 },
+  { label: "② 第2象限", text: "90°〜180°", min: 90, max: 180 },
+  { label: "③ 第3象限", text: "180°〜270°", min: 180, max: 270 },
+  { label: "④ 第4象限", text: "270°〜360°未満", min: 270, max: 360 },
+  { label: "⑤ 前半", text: "0°〜180°", min: 0, max: 180 },
+  { label: "⑥ 後半", text: "180°〜360°未満", min: 180, max: 360 },
+  { label: "⑦ 全範囲", text: "0°〜360°未満", min: 0, max: 360 }
+];
+
+const angles = [
+  0, 30, 45, 60, 90, 120, 135, 150,
+  180, 210, 225, 240, 270, 300, 315, 330
+];
+
+// 表示はすべて正確な値（√を含む形）
+const values = {
+  sin: {
+    0:"0", 30:"1/2", 45:"√2/2", 60:"√3/2",
+    90:"1", 120:"√3/2", 135:"√2/2", 150:"1/2",
+    180:"0", 210:"-1/2", 225:"-√2/2", 240:"-√3/2",
+    270:"-1", 300:"-√3/2", 315:"-√2/2", 330:"-1/2"
+  },
+  cos: {
+    0:"1", 30:"√3/2", 45:"√2/2", 60:"1/2",
+    90:"0", 120:"-1/2", 135:"-√2/2", 150:"-√3/2",
+    180:"-1", 210:"-√3/2", 225:"-√2/2", 240:"-1/2",
+    270:"0", 300:"1/2", 315:"√2/2", 330:"√3/2"
+  },
+  tan: {
+    0:"0", 30:"√3/3", 45:"1", 60:"√3",
+    90:"定義されない", 120:"-√3", 135:"-1", 150:"-√3/3",
+    180:"0", 210:"√3/3", 225:"1", 240:"√3",
+    270:"定義されない", 300:"-√3", 315:"-1", 330:"-√3/3"
+  }
+};
+
+const functions = ["sin", "cos", "tan"];
+const allAnswers = [...new Set(Object.values(values)
+  .flatMap(group => Object.values(group)))];
+
+let selectedRange = 0;
+let current = null;
+let answered = false;
+let questionCount = 0;
+let correctCount = 0;
+let lastQuestions = [];
+
+const $ = id => document.getElementById(id);
+
+function shuffle(array) {
+  const a = [...array];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildRanges() {
+  $("ranges").innerHTML = "";
+  ranges.forEach((range, i) => {
+    const button = document.createElement("button");
+    button.className = "range" + (i === selectedRange ? " active" : "");
+    button.innerHTML =
+      `<strong>${range.label}</strong>${range.text}`;
+    button.setAttribute("aria-pressed", i === selectedRange);
+    button.onclick = () => {
+      selectedRange = i;
+      buildRanges();
+      newQuestion();
+    };
+    $("ranges").appendChild(button);
+  });
+}
+
+function getAvailableAngles() {
+  const r = ranges[selectedRange];
+  // 隣り合う範囲で境界の角度が重複しないよう、
+  // ①〜③は右端を除外、④〜⑦は指定どおり360°未満。
+  return angles.filter(a => {
+    if (selectedRange <= 2) return a >= r.min && a < r.max;
+    return a >= r.min && a < r.max;
+  });
+}
+
+function newQuestion() {
+  answered = false;
+  $("feedback").className = "";
+  $("feedback").textContent = "";
+  $("next").disabled = true;
+  $("rangeLabel").textContent = ranges[selectedRange].text;
+  $("questionNo").textContent = `第 ${questionCount + 1} 問`;
+
+  const available = getAvailableAngles();
+  let candidates = [];
+
+  for (const angle of available) {
+    for (const fn of functions) {
+      const key = `${fn}-${angle}`;
+      if (!lastQuestions.includes(key)) {
+        candidates.push({ angle, fn, key });
+      }
+    }
+  }
+
+  // 全パターンを出題したら履歴をクリア
+  if (candidates.length === 0) {
+    lastQuestions = [];
+    candidates = available.flatMap(angle =>
+      functions.map(fn => ({ angle, fn, key: `${fn}-${angle}` }))
+    );
+  }
+
+  current = candidates[Math.floor(Math.random() * candidates.length)];
+  lastQuestions.push(current.key);
+  if (lastQuestions.length > Math.min(8, available.length * 3 - 1)) {
+    lastQuestions.shift();
+  }
+
+  $("expression").textContent = `${current.fn} ${current.angle}° = ?`;
+  const correctAnswer = values[current.fn][current.angle];
+
+  // 正解と異なる値から3つ選び、4択にする
+  const distractors = shuffle(
+    allAnswers.filter(v => v !== correctAnswer)
+  ).slice(0, 3);
+
+  const choices = shuffle([correctAnswer, ...distractors]);
+  $("choices").innerHTML = "";
+
+  choices.forEach(value => {
+    const button = document.createElement("button");
+    button.className = "choice";
+    button.textContent = value;
+    button.onclick = () => chooseAnswer(value, button);
+    $("choices").appendChild(button);
+  });
+}
+
+function chooseAnswer(value, button) {
+  if (answered) return;
+  answered = true;
+  questionCount++;
+
+  const correctAnswer = values[current.fn][current.angle];
+  const isCorrect = value === correctAnswer;
+
+  if (isCorrect) correctCount++;
+
+  document.querySelectorAll(".choice").forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correctAnswer) b.classList.add("correct");
+    else if (b === button && !isCorrect) b.classList.add("wrong");
+  });
+
+  $("feedback").className = "show " + (isCorrect ? "good" : "bad");
+  $("feedback").innerHTML = isCorrect
+    ? `<strong>正解！</strong><br>${current.fn} ${current.angle}° = ${correctAnswer}`
+    : `<strong>${value === "（未回答）" ? "解答を確認しよう" : "不正解！"}</strong><br>正解は ${correctAnswer} です。`;
+
+  updateStats();
+  $("next").disabled = false;
+}
+
+function updateStats() {
+  $("total").textContent = questionCount;
+  $("correct").textContent = correctCount;
+  $("rate").textContent = questionCount
+    ? Math.round(correctCount / questionCount * 100) + "%"
+    : "0%";
+}
+
+$("next").onclick = newQuestion;
+
+$("skip").onclick = () => {
+  if (!answered) chooseAnswer("（未回答）", null);
+  $("feedback").innerHTML =
+    `<strong>正解を確認しよう</strong><br>正解は ${values[current.fn][current.angle]} です。`;
+};
+
+$("reset").onclick = () => {
+  questionCount = 0;
+  correctCount = 0;
+  lastQuestions = [];
+  updateStats();
+  newQuestion();
+};
+
+buildRanges();
+newQuestion();
+</script>
+</body>
+</html>
